@@ -8,7 +8,7 @@
 // 8. Active song
 // 9. Scroll active song into view
 // 10. Play song when click
-const PLAYER_STORAGE_KEY = 'AQ - MUSIC'
+const PLAYER_STORAGE_KEY = "AQ - MUSIC";
 const $ = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
@@ -24,6 +24,10 @@ const nextBtn = $(".btn-next");
 const randomBtn = $(".btn-random");
 const repeatBtn = $(".btn-repeat");
 const playlist = $(".playlist");
+
+const songTrack = $('.song-track');
+const songCurrent = $('.song-current');
+const songDuration = $('.song-duration')
 
 const app = {
   currentIndex: 0,
@@ -78,9 +82,9 @@ const app = {
       id: 20,
     },
   ],
-  setConfig: function (key,value) {
+  setConfig: function (key, value) {
     this.config[key] = value;
-    localStorage.setItem(PLAYER_STORAGE_KEY,JSON.stringify(this.config));
+    localStorage.setItem(PLAYER_STORAGE_KEY, JSON.stringify(this.config));
   },
   render: function () {
     const htmls = this.songs.map((song, index) => {
@@ -170,7 +174,14 @@ const app = {
         const progressPercent = Math.floor(
           (audio.currentTime / audio.duration) * 100
         );
+        songTrack.style.width = progressPercent+'%';
         progress.value = progressPercent;
+
+        // Get time in song
+        songDuration.innerHTML = _this.formatTimer(audio.duration);
+
+        songCurrent.innerHTML = _this.formatTimer(audio.currentTime);
+
       }
     };
 
@@ -206,14 +217,14 @@ const app = {
     // Xử lí bật / tắt random song
     randomBtn.onclick = function (event) {
       _this.isRandom = !_this.isRandom;
-      _this.setConfig("isRandom",_this.isRandom);
+      _this.setConfig("isRandom", _this.isRandom);
       randomBtn.classList.toggle("active", _this.isRandom);
     };
-    
+
     // Repeat Song
     repeatBtn.onclick = function (event) {
       _this.isRepeat = !_this.isRepeat;
-      _this.setConfig("isRepeat",_this.isRepeat);
+      _this.setConfig("isRepeat", _this.isRepeat);
 
       repeatBtn.classList.toggle("active", _this.isRepeat);
     };
@@ -234,27 +245,31 @@ const app = {
         if (songNode) {
           _this.currentIndex = Number(songNode.dataset.index);
           _this.loadCurrentSong();
-          _this.render()
+          _this.render();
           audio.play();
         }
         // Xử lí khi click vào song option
         if (optionSong) {
-
         }
       }
     };
   },
-
+  formatTimer: function (number) {
+    const minutes = Math.floor(number / 60);
+    const seconds = Math.floor(number - minutes * 60);
+    return `${
+      minutes < 10 ? "0" + minutes : minutes
+    }:${seconds < 10 ? "0" + seconds : seconds}`;
+  },
   loadCurrentSong: function () {
     heading.textContent = this.currentSong.name;
     cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
 
     audio.src = this.currentSong.path;
   },
-  loadConfig: function(){
+  loadConfig: function () {
     this.isRandom = this.config.isRandom;
     this.isRepeat = this.config.isRepeat;
-
   },
   nextSong: function () {
     this.currentIndex++;
@@ -294,19 +309,27 @@ const app = {
   start: function () {
     // Gán cấu hình từ config vào ứng dụng
     this.loadConfig();
+
     // Định nghĩa các thuộc tính cho object
     this.defineProperty();
+
     // Lắng nghe xử lí các sự kiện
     this.handleEvents();
+
     // Tải thông tin bài hát đầu tiên vào UI khi chạy ứng dụng
     this.loadCurrentSong();
+
     // Random Song
     this.playRandomSong();
+
+    // FormatTimer
+    this.formatTimer();
+
     // Render playlist
     this.render();
-// Hiển thị trạng thái ban đầu của button repeat và random
+
+    // Hiển thị trạng thái ban đầu của button repeat và random
     randomBtn.classList.toggle("active", this.isRandom);
-    
     repeatBtn.classList.toggle("active", this.isRepeat);
   },
 };
