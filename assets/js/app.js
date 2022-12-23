@@ -25,9 +25,9 @@ const randomBtn = $(".btn-random");
 const repeatBtn = $(".btn-repeat");
 const playlist = $(".playlist");
 
-const songTrack = $('.song-track');
-const songCurrent = $('.song-current');
-const songDuration = $('.song-duration')
+const songTrack = $(".song-track");
+const songCurrent = $(".song-current");
+const songDuration = $(".song-duration");
 
 const app = {
   currentIndex: 0,
@@ -174,15 +174,17 @@ const app = {
         const progressPercent = Math.floor(
           (audio.currentTime / audio.duration) * 100
         );
-        songTrack.style.width = progressPercent+'%';
+        songTrack.style.width = progressPercent + "%";
         progress.value = progressPercent;
-
-        // Get time in song
-        songDuration.innerHTML = _this.formatTimer(audio.duration);
-
-        songCurrent.innerHTML = _this.formatTimer(audio.currentTime);
-
       }
+      
+      // Song time
+      if(!audio.duration) {
+        songDuration.textContent = `00:00`;
+      }else{
+        songDuration.textContent = _this.formatTimer(audio.duration);
+      }
+      songCurrent.textContent = _this.formatTimer(audio.currentTime);
     };
 
     // Xử lí khi tua song
@@ -257,15 +259,16 @@ const app = {
   formatTimer: function (number) {
     const minutes = Math.floor(number / 60);
     const seconds = Math.floor(number - minutes * 60);
-    return `${
-      minutes < 10 ? "0" + minutes : minutes
-    }:${seconds < 10 ? "0" + seconds : seconds}`;
+    return `${minutes < 10 ? "0" + minutes : minutes}:${
+      seconds < 10 ? "0" + seconds : seconds
+    }`;
   },
   loadCurrentSong: function () {
     heading.textContent = this.currentSong.name;
     cdThumb.style.backgroundImage = `url('${this.currentSong.image}')`;
 
     audio.src = this.currentSong.path;
+    0;
   },
   loadConfig: function () {
     this.isRandom = this.config.isRandom;

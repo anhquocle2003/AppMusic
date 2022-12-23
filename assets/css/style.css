@@ -155,7 +155,10 @@ header h2 {
   color: var(--primary-color);
   font-weight: bold;
 }
-
+.song-volume{
+  display: flex;
+  justify-content: space-around;
+}
 /* PLAYLIST */
 .playlist {
   margin-top: 408px;
